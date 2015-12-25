@@ -24,8 +24,11 @@ io.on('connection', function (socket) {
       id: socket.id
     });
   });
+
+  socket.on('disconnect', function () {
+    delete sockets[socket.id];
+    io.emit("destroy", {id: socket.id});
+  });
 });
 
-http.listen(3000, function () {
-  console.log('listening on *:3000');
-});
+http.listen(3000);

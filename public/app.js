@@ -33,8 +33,10 @@ socket.on("spawn", function (data) {
   });
 
   stage.addChild(Players[data.id]);
+});
 
-  console.log(Players);
+socket.on("destroy", function (data) {
+  stage.removeChild(Players[data.id]);
 });
 
 
