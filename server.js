@@ -3,7 +3,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var sockets = {};
+var sockets = io.sockets.connected;
 
 app.use(express.static('public'));
 
@@ -13,15 +13,10 @@ io.on('connection', function (socket) {
 
   // Already on Map Players Spawn for Me
   for (var i in sockets) {
-    socket.emit("spawn", {
-      id: sockets[i].id,
-      x: sockets[i]._x,
-      y: sockets[i]._y
-    });
+    if (i !== socket.id) {
+      socket.emit("spawn", {id: sockets[i].id, x: sockets[i]._x, y: sockets[i]._y});
+    }
   }
-
-  // Register Socket Object
-  sockets[socket.id] = socket;
 
   // Handle Move Action
   socket.on("move", function (data) {
@@ -38,8 +33,6 @@ io.on('connection', function (socket) {
 
   // Handle Disconnect Event
   socket.on('disconnect', function () {
-    delete sockets[socket.id];
-
     // Destroy for all Players
     io.emit("destroy", {id: socket.id});
   });
